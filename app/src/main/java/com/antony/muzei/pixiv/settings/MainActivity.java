@@ -47,7 +47,6 @@ public class MainActivity extends PixivMuzeiActivity {
 
         // If Muzei is not installed, this will redirect the user to Muzei's Play Store listing
         if (!isMuzeiInstalled()) {
-            // TODO localize these strings
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.dialogTitle_muzeiNotInstalled))
                     .setMessage(getString(R.string.dialog_installMuzei))

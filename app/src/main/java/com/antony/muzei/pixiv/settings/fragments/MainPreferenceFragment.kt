@@ -24,18 +24,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.preference.*
 import androidx.work.WorkManager
+import com.antony.muzei.pixiv.PixivProviderConst.PREFERENCE_PIXIV_ACCESS_TOKEN
 import com.antony.muzei.pixiv.R
 import com.antony.muzei.pixiv.login.LoginActivity
 import com.antony.muzei.pixiv.provider.PixivArtProviderDefines
 import com.antony.muzei.pixiv.provider.PixivArtWorker.Companion.enqueueLoad
-import com.antony.muzei.pixiv.PixivProviderConst
 import com.antony.muzei.pixiv.util.IntentUtils
+import com.antony.muzei.pixiv.util.snackbar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.util.*
-
-import com.antony.muzei.pixiv.PixivProviderConst.PREFERENCE_PIXIV_ACCESS_TOKEN
-
 
 class MainPreferenceFragment : PreferenceFragmentCompat() {
     private var oldUpdateMode: String? = null
@@ -67,9 +65,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
             // User has selected an authenticated feed mode, but has not yet logged in as evidenced
             // by the lack of an access token
             if (isAuthUpdateMode && sharedPrefs.getString(PREFERENCE_PIXIV_ACCESS_TOKEN, "")!!.isEmpty()) {
-                Snackbar.make(requireView(), R.string.toast_loginFirst,
-                        Snackbar.LENGTH_SHORT)
-                        .show()
+                snackbar(requireView()) {
+                    textRes = R.string.toast_loginFirst
+                    duration = Snackbar.LENGTH_SHORT
+                }
                 return@setOnPreferenceChangeListener false
             }
             // If any of the auth feed modes, reveal login Preference Category, reveal the auth NSFW filtering,
@@ -217,9 +216,10 @@ class MainPreferenceFragment : PreferenceFragmentCompat() {
                 File(dir, child).delete()
             }
             enqueueLoad(true, context)
-            Snackbar.make(requireView(), R.string.toast_clearingCache,
-                    Snackbar.LENGTH_SHORT)
-                    .show()
+            snackbar(requireView()) {
+                textRes = R.string.toast_clearingCache
+                duration = Snackbar.LENGTH_SHORT
+            }
             newUpdateMode = oldUpdateMode
             true
         }

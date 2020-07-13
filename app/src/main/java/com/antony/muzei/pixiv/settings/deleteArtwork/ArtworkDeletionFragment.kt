@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.antony.muzei.pixiv.BuildConfig
 import com.antony.muzei.pixiv.R
 import com.antony.muzei.pixiv.provider.PixivArtProvider
+import com.antony.muzei.pixiv.util.snackbar
 import com.google.android.apps.muzei.api.provider.ProviderContract.Artwork.TOKEN
 import com.google.android.apps.muzei.api.provider.ProviderContract.getProviderClient
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -68,16 +69,18 @@ class ArtworkDeletionFragment : Fragment() {
         fab.setOnClickListener {
             // Optimization if no artworks are selected
             if (ArtworkContent.SELECTED_ITEMS.isEmpty()) {
-                Snackbar.make(requireView(), R.string.snackbar_selectArtworkFirst,
-                        Snackbar.LENGTH_LONG)
-                        .show()
+                snackbar(requireView()) {
+                    textRes = R.string.snackbar_selectArtworkFirst
+                    duration = Snackbar.LENGTH_LONG
+                }
                 return@setOnClickListener
             }
             else {
                 val numberDeleted = ArtworkContent.SELECTED_ITEMS.size
-                Snackbar.make(requireView(), numberDeleted.toString() + " " + getString(R.string.snackbar_deletedArtworks),
-                        Snackbar.LENGTH_LONG)
-                        .show()
+                snackbar(requireView()) {
+                    text = numberDeleted.toString() + " " + getString(R.string.snackbar_deletedArtworks)
+                    duration = Snackbar.LENGTH_LONG
+                }
             }
 
             // Deletes the artwork items from the ArrayList used as backing for the RecyclerView
