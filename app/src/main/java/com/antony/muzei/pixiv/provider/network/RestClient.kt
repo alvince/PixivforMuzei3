@@ -65,6 +65,20 @@ object RestClient {
             logOnDebug()
         }
 
+    fun getPixivAjaxRetrofit(): Retrofit = OkHttpClient.Builder()
+        .apply {
+            addNetworkInterceptor(PixivAuthHeaderInterceptor())
+            addInterceptor(CustomClientHeaderInterceptor())
+            logOnDebug()
+        }
+        .let {
+            Retrofit.Builder()
+                .client(it.build())
+                .baseUrl("$PIXIV_HOST_URL/ajax")
+                .addConverterFactory(MoshiConverterFactory.create())
+                .build()
+        }
+
     // Used for acquiring Ranking JSON
     fun getRetrofitRankingInstance(bypass: Boolean): Retrofit {
         val okHttpClientRankingBuilder = OkHttpClient.Builder() // Debug logging interceptor
@@ -151,15 +165,15 @@ object RestClient {
         if (bypass) {
             Log.v("REST", "bypass active")
             okHttpClientAuthBuilder
-                    .sslSocketFactory(RubySSLSocketFactory(), x509TrustManager)
-                    .hostnameVerifier(HostnameVerifier { _: String?, _: SSLSession? -> true })
-                    .dns(RubyHttpDns())
+                .sslSocketFactory(RubySSLSocketFactory(), x509TrustManager)
+                .hostnameVerifier(HostnameVerifier { _: String?, _: SSLSession? -> true })
+                .dns(RubyHttpDns())
         }
         return Retrofit.Builder()
-                .baseUrl("https://oauth.secure.pixiv.net")
-                .client(okHttpClientAuthBuilder.build())
-                .addConverterFactory(MoshiConverterFactory.create())
-                .build()
+            .baseUrl("https://oauth.secure.pixiv.net")
+            .client(okHttpClientAuthBuilder.build())
+            .addConverterFactory(MoshiConverterFactory.create())
+            .build()
     }
 
     fun getRetrofitBookmarkInstance(bypass: Boolean): Retrofit {
@@ -239,6 +253,16 @@ object RestClient {
                 .header("X-Client-Hash", hashSecret)
                 .build()
             return chain.proceed(request)
+        }
+    }
+
+    private class CustomAjaxRequestInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val request = chain.request().newBuilder()
+                .header(
+                    "User-Agent",
+                    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"
+                )
         }
     }
 
